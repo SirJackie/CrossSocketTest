@@ -53,7 +53,7 @@ public class Server : MonoBehaviour {
 		
 	}
 
-	void NetMain(){
+	void NetMain () {
 		TcpListener listener = new TcpListener (
 			System.Net.IPAddress.Any,
 			12345

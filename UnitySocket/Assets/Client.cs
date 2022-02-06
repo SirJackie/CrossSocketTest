@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 public class Client : MonoBehaviour {
 
@@ -39,33 +40,30 @@ public class Client : MonoBehaviour {
 		return RecvMessage (stream, msgLen);
 	}
 
-	TcpClient client;
-	NetworkStream stream;
-
 	// Use this for initialization
 	void Start () {
-		client = new TcpClient ("127.0.0.1", 12345);
-		stream = client.GetStream ();
+		Thread networkThread = new Thread (new ThreadStart (NetMain));
+		networkThread.IsBackground = true;
+		networkThread.Start ();
 	}
-
-	int count = 0;
 	
 	// Update is called once per frame
 	void Update () {
-		if (count == 11) {
-			return;
+		
+	}
+
+	void NetMain () {
+		TcpClient client = new TcpClient ("127.0.0.1", 12345);
+		NetworkStream stream = client.GetStream ();
+
+		for (int i = 0; i < 10; i++) {
+			SafeSendMessage (stream, "get message please");
+			string msg = SafeRecvMessage (stream);
+			Debug.Log (msg);
 		}
 
-		if (count == 10) {
-			SafeSendMessage (stream, "close socket please");
-			count++;
-			return;
-		}
-
-		SafeSendMessage (stream, "get message please");
-		string msg = SafeRecvMessage (stream);
-		Debug.Log (msg);
-
-		count++;
+		SafeSendMessage (stream, "close socket please");
+		stream.Close ();
+		client.Close ();
 	}
 }
