@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 public class Server : MonoBehaviour {
 
@@ -39,50 +40,52 @@ public class Server : MonoBehaviour {
 		return RecvMessage(stream, msgLen);
 	}
 
-	TcpListener listener;
-	TcpClient client;
-	NetworkStream stream;
-
 	// Use this for initialization
 	void Start () {
 
-		// Start Server
-		listener = new TcpListener (
+		Thread networkThread = new Thread(new ThreadStart(NetMain));
+		networkThread.IsBackground = true;
+		networkThread.Start ();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+	void NetMain(){
+		TcpListener listener = new TcpListener (
 			System.Net.IPAddress.Any,
 			12345
 		);
 		listener.Start ();
+		while (true) {
+			TcpClient client = listener.AcceptTcpClient ();
 
-		// Accept Client and Show Info
-		client = listener.AcceptTcpClient ();
-		if (client.Client.RemoteEndPoint != null) {
-			// If there is some informations to show
-			IPEndPoint clientInfo = 
-				(IPEndPoint)client.Client.RemoteEndPoint;
-			Debug.Log (
-				"Client Accepted: ('" +
-				clientInfo.Address.ToString () + "', " +
-				clientInfo.Port.ToString () + ")"
-			);
-		}
-		stream = client.GetStream ();
-
-	}
-
-	bool noLongerUpdate = false;
-	
-	// Update is called once per frame
-	void Update () {
-		if (noLongerUpdate == false) {
-			string msg = SafeRecvMessage (stream);
-			if (msg == "get message please") {
-				SafeSendMessage (stream, "Hello World!");
-			} else if (msg == "close socket please") {
-				stream.Close ();
-				client.Close ();
-				noLongerUpdate = true;
+			if (client.Client.RemoteEndPoint != null) {
+				// If there is some informations to show
+				IPEndPoint clientInfo = 
+					(IPEndPoint)client.Client.RemoteEndPoint;
+				
+				Debug.Log (
+					"Client Accepted: ('" +
+					clientInfo.Address.ToString () + "', " +
+					clientInfo.Port.ToString () + ")"
+				);
 			}
-		}
 
+			NetworkStream stream = client.GetStream ();
+			while (true) {
+				string msg = SafeRecvMessage (stream);
+				if (msg == "get message please") {
+					SafeSendMessage (stream, "Hello World!");
+				} else if (msg == "close socket please") {
+					break;
+				}
+			}
+
+			stream.Close ();
+			client.Close ();
+		}
 	}
 }
