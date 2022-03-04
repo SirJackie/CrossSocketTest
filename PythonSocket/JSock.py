@@ -49,7 +49,8 @@ class JSock:
         self.mode = "Client"
         while True:
             try:
-                print(f"Connecting: ({ip}, {port})")
+                if self.debug:
+                    print(f"Connecting: ({ip}, {port})")
                 self.s.connect((ip, port))
                 break
             except ConnectionRefusedError:
