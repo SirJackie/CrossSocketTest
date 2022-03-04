@@ -11,5 +11,5 @@ while True:
         if msg == "get message please":
             jsock.SendStr("Hello World!")
         elif msg == "close socket please":
-            jsock.CloseClient()
+            jsock.Close()
             break

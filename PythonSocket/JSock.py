@@ -25,18 +25,9 @@ class JSock:
     def AcceptClient(self):
         if self.mode != "Server":
             raise Exception("You're trying to accept a client using a client socket.")
-            return
         self.clientSocket, self.address = self.s.accept()
         if self.debug:
             print(f"Client Accepted: {self.address}")
-
-    def CloseClient(self):
-        if self.mode != "Server":
-            raise Exception("You're trying to close a accepted client using a client socket.")
-            return
-        self.clientSocket.close()
-        if self.debug:
-            print("The Accepted Client is Closed.")
 
     def SendStr(self, msgStr):
         if self.mode == "Server":
@@ -53,3 +44,20 @@ class JSock:
             s = self.s
         msgLen = int(s.recv(10).decode("utf-8").strip())
         return s.recv(msgLen).decode("utf-8")
+
+    def Connect(self, ip, port):
+        self.mode = "Client"
+        while True:
+            try:
+                print(f"Connecting: ({ip}, {port})")
+                self.s.connect((ip, port))
+                break
+            except ConnectionRefusedError:
+                if self.debug:
+                    print("Failed to Connect, Reconnecting...")
+
+    def Close(self):
+        if self.mode == "Server":
+            self.clientSocket.close()
+        else:
+            self.s.close()
