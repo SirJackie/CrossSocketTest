@@ -54,11 +54,16 @@ public class Server : MonoBehaviour {
 	}
 
 	void NetMain () {
+		// --------------------------------------------------------------------------
+		Debug.Log ("Network Server Thread Started, Creating Server...");
 		TcpListener listener = new TcpListener (
 			System.Net.IPAddress.Any,
 			12345
 		);
 		listener.Start ();
+		Debug.Log ("Server Created, Port: " + 12345.ToString ());
+		// --------------------------------------------------------------------------
+
 		while (true) {
 			TcpClient client = listener.AcceptTcpClient ();
 

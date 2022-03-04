@@ -53,7 +53,20 @@ public class Client : MonoBehaviour {
 	}
 
 	void NetMain () {
-		TcpClient client = new TcpClient ("127.0.0.1", 12345);
+		// --------------------------------------------------------------------------
+		Debug.Log ("Network Client Thread Started.");
+		TcpClient client = null;
+		Reconnect:
+		try {
+			Debug.Log ("Connecting Server...");
+			client = new TcpClient ("127.0.0.1", 12345);
+		} catch {
+			Debug.Log ("Failed to Connect, Retrying...");
+			goto Reconnect;
+		}
+
+		Debug.Log ("Connected to Server.");
+		// --------------------------------------------------------------------------
 		NetworkStream stream = client.GetStream ();
 
 		for (int i = 0; i < 10; i++) {
