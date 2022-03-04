@@ -46,7 +46,21 @@ namespace Client
 
         public static void Main(string[] arg)
         {
-            TcpClient client = new TcpClient("127.0.0.1", 12345);
+            TcpClient client;
+
+            while (true)
+            {
+                try
+                {
+                    client = new TcpClient("127.0.0.1", 12345);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            
             NetworkStream stream = client.GetStream();
 
             for (int i = 0; i < 10; i++)
