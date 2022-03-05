@@ -16,6 +16,7 @@ namespace Server
             while (true)
             {
                 jsock.AcceptClient();
+
                 while (true)
                 {
                     string msg = jsock.RecvStr();

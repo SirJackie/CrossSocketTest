@@ -9,3 +9,4 @@ for i in range(0, 10):
     print(msg)
 
 jsock.SendStr("close socket please")
+jsock.Close()
