@@ -6,7 +6,6 @@ class JSock:
     mode = None
     s = None
     clientSocket = None
-    address = None
 
     def __init__(self, debug_=True):
         self.debug = debug_
@@ -25,9 +24,9 @@ class JSock:
     def AcceptClient(self):
         if self.mode != "Server":
             raise Exception("You're trying to accept a client using a client socket.")
-        self.clientSocket, self.address = self.s.accept()
+        self.clientSocket, address = self.s.accept()
         if self.debug:
-            print(f"Client Accepted: {self.address}")
+            print(f"Client Accepted: {address}")
 
     def SendStr(self, msgStr):
         if self.mode == "Server":

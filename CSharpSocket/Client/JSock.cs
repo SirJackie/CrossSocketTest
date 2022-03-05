@@ -8,14 +8,57 @@ class JSock
 {
     bool debug;
     string mode;
-    TcpClient s;
+    TcpClient client;
+    TcpListener server;
     NetworkStream stream;
-    //clientSocket = None
-    //address = None
 
     public JSock(bool debug_=true)
     {
         debug = debug_;
+    }
+
+    public void StartServer(int port, int maxConnections=32)
+    {
+        mode = "Server";
+        server = new TcpListener(
+            System.Net.IPAddress.Any,
+            port
+        );
+        server.Start();
+        if (debug)
+        {
+            Console.WriteLine("Server Started at Port: " + port.ToString());
+        }
+    }
+
+    public void AcceptClient()
+    {
+        if (mode != "Server")
+        {
+            throw new Exception(
+                "You're trying to accept a client using a client socket."
+            );
+        }
+
+        client = server.AcceptTcpClient();
+
+        if (client.Client.RemoteEndPoint != null)
+        {
+            // If there is some informations to show
+            IPEndPoint clientInfo =
+                (IPEndPoint)client.Client.RemoteEndPoint;
+
+            if (debug)
+            {
+                Console.WriteLine(
+                    "Client Accepted: ('" +
+                    clientInfo.Address.ToString() + "', " +
+                    clientInfo.Port.ToString() + ")"
+                );
+            }
+        }
+
+        stream = client.GetStream();
     }
 
     public void SendStrInsecurely(string msg)
@@ -67,8 +110,8 @@ class JSock
                         "Connecting: (" + ip + ", " + port.ToString() + ")"
                     );
                 }
-                s = new TcpClient(ip, port);
-                stream = s.GetStream();
+                client = new TcpClient(ip, port);
+                stream = client.GetStream();
                 break;
             }
             catch (Exception e)
@@ -84,6 +127,6 @@ class JSock
     public void Close()
     {
         stream.Close();
-        s.Close();
+        client.Close();
     }
 }
