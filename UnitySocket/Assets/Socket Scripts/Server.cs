@@ -1,36 +1,46 @@
-﻿using System;
-using System.Text;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Threading;
 
-namespace Server
-{
-    class Server
-    {
-        public static void Main(string[] args)
-        {
-            JSock jsock = new JSock();
-            jsock.StartServer(12345);
+public class Server : MonoBehaviour {
 
-            while (true)
-            {
-                jsock.AcceptClient();
+	Thread sockThread;
 
-                while (true)
-                {
-                    string msg = jsock.RecvStr();
-                    if(msg == "get message please")
-                    {
-                        jsock.SendStr("Hello World!");
-                    }
-                    else if (msg == "close socket please")
-                    {
-                        jsock.Close();
-                        break;
-                    }
-                }
-            }
-        }
-    }
+	// Use this for initialization
+	void Start () {
+		sockThread = new Thread (new ThreadStart (SockMain));
+		sockThread.IsBackground = true;  // Background Thread
+		sockThread.Start ();
+	}
+
+	public static void SockMain()
+	{
+		JSock jsock = new JSock();
+		jsock.StartServer(12345);
+
+		while (true)
+		{
+			jsock.AcceptClient();
+
+			while (true)
+			{
+				string msg = jsock.RecvStr();
+				if(msg == "get message please")
+				{
+					jsock.SendStr("Hello World!");
+				}
+				else if (msg == "close socket please")
+				{
+					jsock.Close();
+					break;
+				}
+			}
+		}
+
+	}
+
+	void OnDestroy(){
+		sockThread.Abort ();
+	}
 }
