@@ -2,6 +2,9 @@
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 class JSock
 {
@@ -26,7 +29,7 @@ class JSock
         server.Start();
         if (debug)
         {
-            Console.WriteLine("Server Started at Port: " + port.ToString());
+            Debug.Log("Server Started at Port: " + port.ToString());
         }
     }
 
@@ -49,7 +52,7 @@ class JSock
 
             if (debug)
             {
-                Console.WriteLine(
+                Debug.Log(
                     "Client Accepted: ('" +
                     clientInfo.Address.ToString() + "', " +
                     clientInfo.Port.ToString() + ")"
@@ -105,7 +108,7 @@ class JSock
             {
                 if (debug)
                 {
-                    Console.WriteLine(
+                    Debug.Log(
                         "Connecting: (" + ip + ", " + port.ToString() + ")"
                     );
                 }
@@ -117,7 +120,7 @@ class JSock
             {
                 if (debug)
                 {
-                    Console.WriteLine("Failed to Connect, Reconnecting...");
+                    Debug.Log("Failed to Connect, Reconnecting...");
                 }
             }
         }
